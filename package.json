@@ -1,0 +1,22 @@
+{
+  "name": "tinyurl",
+  "version": "1.0.0",
+  "description": "makes url tiny",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Socha17/tinyUrl.git"
+  },
+  "author": "Matt Socha",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Socha17/tinyUrl/issues"
+  },
+  "homepage": "https://github.com/Socha17/tinyUrl#readme",
+  "dependencies": {
+    "express": "^4.15.2"
+  }
+}
