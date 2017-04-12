@@ -1,12 +1,16 @@
 <% include ./partials/_header %>
 <body>
     <!-- Add your EJS code here -->
-    <ol>
-      <li>google short form: goog</li>
-      <li>facebook short form: FB</li>
-      <li>youtube short form: YT</li>
-    </ol>
 
+      <% Object.keys(urls).forEach(function(url, i, a){ %>
+      <li><%= Object.keys(urls)[i] %>  <%= urls[url] %>  <form method="POST" style="display: inline;" action="/urls/<%= Object.keys(urls)[i] %>/delete">
+        <button type="delete" name="delete">Delete</button>
+      </form>
+      <form action="/urls/<%= Object.keys(urls)[i] %>" style="display: inline;">
+        <button type="update" name="update">Update</button>
+      </form>
+    </li>
+      <%  }); %>
 
     <a href="#">Make stuff short</a>
 
