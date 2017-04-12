@@ -2,7 +2,10 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser')
 
+
+app.use(cookieParser())
 app.set("view engine", "ejs")
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -14,6 +17,13 @@ const urlDatabase = {
 
 app.get("/", (req, res) => {
   res.end("Hello!!! Welcome to Tiny Url");
+});
+
+app.post("/login", (req, res) => {
+  console.log('clicked log in');
+  console.log(req.body.username);
+  res.cookie('username', req.body.username);
+  res.redirect('/');
 });
 
 app.get("/urls", (req, res) => {

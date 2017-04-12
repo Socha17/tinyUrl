@@ -3,7 +3,7 @@
 <h1>Full and Short URL:<%= shortURL %>  <%= urls %> </h1>
 
 
-<form action="/urls/b2xVn2/update" method="POST" style="margin:150px;">
+<form action="/urls/<%= shortURL %>/update" method="POST" style="margin:150px;">
   <label for="update">Update URL:</label>
   <input id="update" type="text" name="update" placeholder="http://" style="width: 300px">
   <input type="submit" value="Submit">
