@@ -15,6 +15,8 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// how to send vars to partials, and make conditions of them
+
 app.get("/", (req, res) => {
   res.end("Hello!!! Welcome to Tiny Url");
 });
@@ -26,9 +28,16 @@ app.post("/login", (req, res) => {
   res.redirect('/');
 });
 
+app.post("/logout", (req, res) => {
+  console.log('clicked log out');
+  console.log(req.body.username);
+  res.clearCookie('username', req.body.username)
+  res.redirect('/urls');
+});
+
 app.get("/urls", (req, res) => {
   console.log('you are the the urls page');
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { urls: urlDatabase, username: req.cookies["username"] };
   res.render("urls_index", templateVars);
 });
 
@@ -52,7 +61,8 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = {  username: req.cookies["username"] };
+  res.render("urls_new", templateVars);
 });
 
 app.post("/urls", (req, res) => {
@@ -62,7 +72,8 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id, urls: urlDatabase[req.params.id] };
+
+  let templateVars = { shortURL: req.params.id, urls: urlDatabase[req.params.id], username: req.cookies["username"] };
   res.render("urls_show", templateVars);
 });
 

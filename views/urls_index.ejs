@@ -1,7 +1,7 @@
 <% include ./partials/_header %>
 <body>
     <!-- Add your EJS code here -->
-
+      
       <% Object.keys(urls).forEach(function(url, i, a){ %>
       <li><%= Object.keys(urls)[i] %>  <%= urls[url] %>  <form method="POST" style="display: inline;" action="/urls/<%= Object.keys(urls)[i] %>/delete">
         <button type="delete" name="delete">Delete</button>

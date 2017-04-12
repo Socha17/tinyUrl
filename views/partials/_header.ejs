@@ -5,7 +5,14 @@
 </head>
 
 
-<form action="/login" method="POST" style="float: right;">
-  <input id="username" type="text" name="username" placeholder="username" style="width: 150px">
-  <button type="login" name="login">Log in</button>
-</form>
+<% if (username == undefined) { %>
+  <form action="/login" method="POST" style="float: right;">
+    <input id="username" type="text" name="username" placeholder="username" style="width: 150px">
+    <button type="login" name="login">Log in</button>
+  </form>
+  <% } else { %>
+    <form action="/logout" method="POST" style="float: right;">
+      <h3> <%= username %> </h3>
+      <button type="logout" name="logout">Log out</button>
+    </form>
+     <% } %>
