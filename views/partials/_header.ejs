@@ -2,17 +2,22 @@
 <html lang="en">
 <head>
   <title>TinyApp</title>
+  <link href="/css/styles.css" rel="stylesheet" />
 </head>
 
 
-<% if (username == undefined) { %>
-  <form action="/login" method="POST" style="float: right;">
-    <input id="username" type="text" name="username" placeholder="username" style="width: 150px">
-    <button type="login" name="login">Log in</button>
+
+<% if (loginStatus == false) { %>
+  <form action="/register" style="float: right;">
+    <button type="register" name="register">Register</button>
   </form>
-  <% } else { %>
-    <form action="/logout" method="POST" style="float: right;">
-      <h3> <%= username %> </h3>
-      <button type="logout" name="logout">Log out</button>
-    </form>
-     <% } %>
+
+  <form action="/login" style="float: right;">
+    <button type="login" name="login">Login</button>
+  </form>
+<% } else { %>
+  <form action="/logout" method="POST"  style="float: right;">
+    <button type="logout" name="logout">Logout</button>
+  </form>
+
+  <% } %>
