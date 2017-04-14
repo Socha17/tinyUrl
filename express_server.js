@@ -13,24 +13,31 @@ app.use(bodyParser.urlencoded({extended: true}));
 // why are we using keys as codes?
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "9sm5xK": "http://www.google.com",
+  "sdfsdf": "sfsdfsdffs",
+  "rwerwerwer": "nmvbnn"
 };
 
 const users = {
     "userRandomID": {
       id: "userRandomID",
       email: "user@example.com",
-      password: "purple-monkey-dinosaur"
+      password: "purple-monkey-dinosaur",
+      shortURL: ["b2xVn2", "sdfsdf", "rwerwerwer"],
+      longURL: ["http://www.lighthouselabs.ca", "sfsdfsdffs", "nmvbnn"]
     },
    "user2RandomID": {
      id: "user2RandomID",
      email: "user2@example.com",
-     password: "dishwasher-funk"
- }
+     password: "dishwasher-funk",
+     shortURL: ["9sm5xK"],
+     longURL: ["http://www.google.com"]
+   }
 };
 
 
-let loginStatus = false
+let loginStatus = false;
+let loggedEmail = {};
 
 app.get("/", (req, res) => {
   res.end("Hello!!! Welcome to Tiny Url");
@@ -38,41 +45,54 @@ app.get("/", (req, res) => {
 
 // register page
 app.get("/register", (req, res) => {
-  let templateVars = { urls: urlDatabase, allUsers: users, loginStatus };
+  const currentUser = req.cookie ? users[req.cookie['user_id']] : null;
+  let templateVars = { urls: urlDatabase, allUsers: users, loginStatus, currentUser };
+  console.log("currentUser from register" + currentUser);
   res.render("urls_register", templateVars);
 });
 // register post
 app.post("/register", (req, res) => {
   const checkEmails = checkRegisterEmails(req.body.email, users)
-  console.log('this is checkEmails' + checkEmails);
+  console.log('this is req.body.email ' + req.body.email);
+  console.log('this is checkEmails ' + checkEmails);
     // add another if statment if email entered already exists return error
   if (req.body.email == "") {
     console.log('error 401');
     res.statusCode = 401;
     res.end("error 401 text field was blank")
   }
-  if (checkEmails == false) {
+  // check if email exists
+  if (checkEmails == "") {
+    const createID = generateRandomString()
+    // urlDatabase[createID] = "";
+    users[createID] = {
+      id: createID,
+      email: req.body.email,
+      password: req.body.password,
+      shortURL: [],
+      longURL: []
+    };
+    loginStatus = true;
+    loggedEmail = req.body.email;
+    console.log(urlDatabase);
+    console.log("THIS IS USERS urlDatabase IS ^^^^^");
+    console.log(users);
+    res.cookie('user_id', createID);
+    let userID = createID
+    const currentUser = users[userID];
+    res.redirect('/');
+  } else {
     res.statusCode = 401;
     res.end("error 401 email already exists")
   }
 
-  const createID = generateRandomString()
-  users[createID] = {
-    id: createID,
-    email: req.body.email,
-    password: req.body.password
-  };
-  loginStatus = true
-  // users[createID].email = req.body.email;
-  // users.createID.password = req.body.password;
-  console.log(users);
-  res.cookie('user_id', createID);
-  res.redirect('/');
 });
   // login get
 app.get("/login", (req, res) => {
+  const currentUser = req.cookie ? users[req.cookie['user_id']] : null;
+  console.log('Cookies: ', req.cookies);
   console.log('clicked log in page');
-  let templateVars = { allUsers: users, loginStatus };
+  let templateVars = { allUsers: users, loginStatus, currentUser };
   res.render('urls_login', templateVars);
 });
 // login post
@@ -80,14 +100,22 @@ app.post("/login", (req, res) => {
   console.log('clicked log in');
   // check consts have value of the key from users object
   const checkEmails = checkLoginEmail(req.body.email, users)
+  console.log("this is checkEmails " + checkEmails);
   const checkPassword = checkPasswords(req.body.password, users)
+
   if (checkEmails == "" && checkPassword == "" ) {
     res.statusCode = 403;
     res.end("error 403 make sure email and password are correct")
   } else {
-    loginStatus = true
     res.cookie('user_id', users[checkEmails].id);
+    let userID = users[checkEmails].id
+    const currentUser = users[userID];
+    console.log("this is currentUser " + currentUser);
+    loggedEmail = checkEmails;
+    console.log("this is loggedEmail: " + loggedEmail);
+    loginStatus = true
     res.redirect('/');
+    console.log(users);
   }
 });
 // logout post
@@ -99,16 +127,31 @@ app.post("/logout", (req, res) => {
 });
 // index of urls
 app.get("/urls", (req, res) => {
+  // const currentUser = users[req.cookies[user_id]];
+  const currentUser = req.cookies ? users[req.cookies['user_id']] : null;
+  console.log("this is currentUser" + currentUser);
   console.log('you are the the urls page');
-  let templateVars = { urls: urlDatabase, allUsers: users, loginStatus };
+  let templateVars = { urls: urlDatabase, allUsers: users, loginStatus, userCurrent: currentUser };
   res.render("urls_index", templateVars);
 });
   // delete post
 app.post("/urls/:id/delete", (req, res) => {
-  console.log('you deleted somthing ' + req.params.id);
-  delete urlDatabase[req.params.id];
-  console.log('redirecting back to urls');
-  res.redirect('/urls');
+
+  if (loginStatus == false) {
+    res.statusCode = 403;
+    res.end("error 403 you are not logged in")
+  }
+  properOwner = checkOwner(req.params.id, loggedEmail)
+
+  if (properOwner == false) {
+    res.statusCode = 403;
+    res.end("error 403 you are not the owner of that URL")
+  } else {
+    console.log('you deleted somthing ' + req.params.id);
+    delete urlDatabase[req.params.id];
+    console.log('redirecting back to urls');
+    res.redirect('/urls');
+  }
 });
 
 
@@ -124,28 +167,55 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = {  allUsers: users, loginStatus };
+  const currentUser = req.cookies ? users[req.cookies['user_id']] : null;
+  let templateVars = {  allUsers: users, loginStatus, currentUser };
+  if (loginStatus == false) {
+    res.redirect('/');
+  }
   res.render("urls_new", templateVars);
 });
 
+//  added urls to database
 app.post("/urls", (req, res) => {
+  const currentUser = req.cookies ? users[req.cookies['user_id']] : null;
   const link = generateRandomString();
   urlDatabase[link] = req.body.longURL;
+  users[currentUser.id].longURL.push(req.body.longURL);
+  users[currentUser.id].shortURL.push(link);
+  console.log(users);
   res.redirect('/urls/' + link);
 });
 
 app.get("/urls/:id", (req, res) => {
-
-  let templateVars = { shortURL: req.params.id, urls: urlDatabase[req.params.id], allUsers: users, loginStatus };
+  const currentUser = req.cookies ? users[req.cookies['user_id']] : null;
+  console.log(urlDatabase);
+  console.log(req.params.id);
+  let templateVars = { shortURL: req.params.id, urls: urlDatabase[req.params.id], allUsers: users, loginStatus, userCurrent: currentUser };
   res.render("urls_show", templateVars);
 });
 
 app.post("/urls/:id/update", (req, res) => {
-  console.log('you updated somthing ' + req.params.id);
-  console.log('updating ' + urlDatabase[req.params.id] + ' to ' + req.body.update);
-  urlDatabase[req.params.id] = req.body.update;
-  console.log('redirecting back to urls from update');
-  res.redirect('/urls');
+
+  if (loginStatus == false) {
+    res.statusCode = 403;
+    res.end("error 403 you are not logged in")
+  }
+  console.log("this is req.params.id " + req.params.id);
+  console.log("this is loggedEmail " + loggedEmail);
+  console.log(urlDatabase);
+  console.log("THIS IS USERS urlDatabase IS ^^^^^");
+  console.log(users);
+
+  properOwner = checkOwner(req.params.id, loggedEmail);
+
+  if (properOwner == false) {
+    res.statusCode = 403;
+    res.end("error 403 you are not the owner of that URL")
+  } else {
+    urlDatabase[req.params.id] = req.body.update;
+    res.redirect('/urls');
+  }
+
 });
 
 app.listen(PORT, () => {
@@ -164,13 +234,13 @@ return text;
 
 
 let checkRegisterEmails = (email, objUsers) => {
-  let checkEmails = true;
+  let checkEmails = "";
   Object.keys(objUsers).forEach(function (c, i) {
       if (objUsers[c]['email'] == email) {
-        return checkEmails = false;
+        return checkEmails = c;
       }
   });
-      if (checkEmails == false) { return false; } else { return true; }
+      return checkEmails
 }
 
 
@@ -192,4 +262,17 @@ let checkPasswords = (password, objUsers) => {
       }
   });
       return checkPasswords;
+}
+
+// properOwner = checkOwner(req.params.id, loggedEmail)
+
+let checkOwner = (shortURLID, key) => {
+console.log("key with users: " + users[key].shortURL);
+  console.log("this is keyDOTshorturl " + key.shortURL);
+  console.log("this is shortURLID " + shortURLID);
+      if (users[key].shortURL== shortURLID) {
+        return true
+      } else {
+        return false
+      }
 }
