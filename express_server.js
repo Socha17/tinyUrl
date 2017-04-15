@@ -19,6 +19,7 @@ const urlDatabase = {
   "rwerwerwer": "nmvbnn"
 };
 
+
 const users = {
     "userRandomID": {
       id: "userRandomID",
@@ -35,6 +36,7 @@ const users = {
      longURL: ["http://www.google.com"]
    }
 };
+
 
 
 let loginStatus = false;
@@ -65,13 +67,11 @@ app.post("/register", (req, res) => {
   // check if email exists
   if (checkEmails == "") {
     const createID = generateRandomString()
-    // const hashed_password = bcrypt.hashSync(req.body.password, 10);
-    console.log(req.body.password);
-    // urlDatabase[createID] = "";
+    const hashed_password = bcrypt.hashSync(req.body.password, 10);
     users[createID] = {
       id: createID,
       email: req.body.email,
-      password: req.body.password,
+      password: hashed_password,
       shortURL: [],
       longURL: []
     };
@@ -105,6 +105,8 @@ app.post("/login", (req, res) => {
   const checkEmails = checkLoginEmail(req.body.email, users)
   console.log("this is checkEmails " + checkEmails);
   const checkPassword = checkPasswords(req.body.password, users)
+  const hashed_password = bcrypt.hashSync(req.body.password, 10);
+  bcrypt.compareSync(req.body.password, hashed_password);
 
   if (checkEmails == "" && checkPassword == "" ) {
     res.statusCode = 403;
