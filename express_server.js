@@ -2,12 +2,18 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require("body-parser");
-const cookieParser = require('cookie-parser')
+const cookieSession = require('cookie-session')
 const serveStatic = require('serve-static');
 const bcrypt = require('bcrypt');
 
 app.use(serveStatic(`${__dirname}/public`));
-app.use(cookieParser())
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2'],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 app.set("view engine", "ejs")
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -80,7 +86,8 @@ app.post("/register", (req, res) => {
     console.log(urlDatabase);
     console.log("THIS IS USERS urlDatabase IS ^^^^^");
     console.log(users);
-    res.cookie('user_id', createID);
+    // res.cookie('user_id', createID);
+    req.session.user_id = createID;
     let userID = createID
     const currentUser = users[userID];
     res.redirect('/');
@@ -112,7 +119,8 @@ app.post("/login", (req, res) => {
     res.statusCode = 403;
     res.end("error 403 make sure email and password are correct")
   } else {
-    res.cookie('user_id', users[checkEmails].id);
+    // res.cookie('user_id', users[checkEmails].id);
+    req.session.user_id = users[checkEmails].id;
     let userID = users[checkEmails].id
     const currentUser = users[userID];
     console.log("this is currentUser " + currentUser);
@@ -126,14 +134,14 @@ app.post("/login", (req, res) => {
 // logout post
 app.post("/logout", (req, res) => {
   console.log('clicked log out');
-  res.clearCookie('user_id')
+  req.session = null
   loginStatus = false;
   res.redirect('/');
 });
 // index of urls
 app.get("/urls", (req, res) => {
   // const currentUser = users[req.cookies[user_id]];
-  const currentUser = req.cookies ? users[req.cookies['user_id']] : null;
+  const currentUser = req.session ? users[req.session.user_id] : null;
   console.log("this is currentUser" + currentUser);
   console.log('you are the the urls page');
   let templateVars = { urls: urlDatabase, allUsers: users, loginStatus, userCurrent: currentUser };
@@ -150,7 +158,7 @@ let currentLongURL = 0;
     res.end("error 403 you are not logged in")
   }
 
-  const currentUser = req.cookies ? users[req.cookies['user_id']] : null;
+  const currentUser = req.session ? users[req.session.user_id] : null;
   console.log("delte currentUser.id : " + currentUser.id);
   console.log("delete req.params.id " + req.params.id);
   currentLongURL = findCurrentLongURL(currentUser, req.params.id);
@@ -187,7 +195,7 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  const currentUser = req.cookies ? users[req.cookies['user_id']] : null;
+  const currentUser = req.session ? users[req.session.user_id] : null;
   let templateVars = {  allUsers: users, loginStatus, currentUser };
   if (loginStatus == false) {
     res.redirect('/');
@@ -197,7 +205,7 @@ app.get("/urls/new", (req, res) => {
 
 //  added urls to database
 app.post("/urls", (req, res) => {
-  const currentUser = req.cookies ? users[req.cookies['user_id']] : null;
+  const currentUser = req.session ? users[req.session.user_id] : null;
   const link = generateRandomString();
   urlDatabase[link] = req.body.longURL;
   users[currentUser.id].longURL.push(req.body.longURL);
@@ -207,7 +215,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const currentUser = req.cookies ? users[req.cookies['user_id']] : null;
+  const currentUser = req.session ? users[req.session.user_id] : null;
   console.log(urlDatabase);
   console.log(req.params.id);
   let templateVars = { shortURL: req.params.id, urls: urlDatabase[req.params.id], allUsers: users, loginStatus, userCurrent: currentUser };
@@ -220,7 +228,7 @@ app.post("/urls/:id/update", (req, res) => {
     res.statusCode = 403;
     res.end("error 403 you are not logged in")
   }
-  const currentUser = req.cookies ? users[req.cookies['user_id']] : null;
+  const currentUser = req.session ? users[req.session.user_id] : null;
   console.log("update currentUser.id : " + currentUser.id);
   console.log("update req.params.id " + req.params.id);
   console.log("this is loggedEmail " + loggedEmail);
