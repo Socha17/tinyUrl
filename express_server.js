@@ -4,6 +4,7 @@ const PORT = process.env.PORT || 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser')
 const serveStatic = require('serve-static');
+const bcrypt = require('bcrypt');
 
 app.use(serveStatic(`${__dirname}/public`));
 app.use(cookieParser())
@@ -64,6 +65,8 @@ app.post("/register", (req, res) => {
   // check if email exists
   if (checkEmails == "") {
     const createID = generateRandomString()
+    // const hashed_password = bcrypt.hashSync(req.body.password, 10);
+    console.log(req.body.password);
     // urlDatabase[createID] = "";
     users[createID] = {
       id: createID,
@@ -134,14 +137,27 @@ app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase, allUsers: users, loginStatus, userCurrent: currentUser };
   res.render("urls_index", templateVars);
 });
+
   // delete post
 app.post("/urls/:id/delete", (req, res) => {
-
+console.log("you clicked delete");
+console.log("STARTING DELETE");
+let currentLongURL = 0;
   if (loginStatus == false) {
     res.statusCode = 403;
     res.end("error 403 you are not logged in")
   }
-  properOwner = checkOwner(req.params.id, loggedEmail)
+
+  const currentUser = req.cookies ? users[req.cookies['user_id']] : null;
+  console.log("delte currentUser.id : " + currentUser.id);
+  console.log("delete req.params.id " + req.params.id);
+  currentLongURL = findCurrentLongURL(currentUser, req.params.id);
+  console.log("delete currentLongURL " + currentLongURL);
+  console.log(users);
+  console.log("USERS IS ^^^^^ DATABASE IS BELOW");
+  console.log(urlDatabase);
+
+  properOwner = checkOwner(req.params.id, currentUser.id, currentLongURL);
 
   if (properOwner == false) {
     res.statusCode = 403;
@@ -149,6 +165,8 @@ app.post("/urls/:id/delete", (req, res) => {
   } else {
     console.log('you deleted somthing ' + req.params.id);
     delete urlDatabase[req.params.id];
+    users[currentUser.id].shortURL.splice(currentLongURL, 1)
+    users[currentUser.id].longURL.splice(currentLongURL, 1)
     console.log('redirecting back to urls');
     res.redirect('/urls');
   }
@@ -195,24 +213,34 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls/:id/update", (req, res) => {
-
+  let currentLongURL = 0;
   if (loginStatus == false) {
     res.statusCode = 403;
     res.end("error 403 you are not logged in")
   }
-  console.log("this is req.params.id " + req.params.id);
+  const currentUser = req.cookies ? users[req.cookies['user_id']] : null;
+  console.log("update currentUser.id : " + currentUser.id);
+  console.log("update req.params.id " + req.params.id);
   console.log("this is loggedEmail " + loggedEmail);
-  console.log(urlDatabase);
-  console.log("THIS IS USERS urlDatabase IS ^^^^^");
+  currentLongURL = findCurrentLongURL(currentUser, req.params.id);
+  console.log("update currentLongURL " + currentLongURL);
   console.log(users);
+  console.log("USERS IS ^^^^^ DATABASE IS BELOW");
+  console.log(urlDatabase);
 
-  properOwner = checkOwner(req.params.id, loggedEmail);
+
+  properOwner = checkOwner(req.params.id, currentUser.id, currentLongURL);
 
   if (properOwner == false) {
     res.statusCode = 403;
     res.end("error 403 you are not the owner of that URL")
   } else {
+    console.log("update req.body.update " + req.body.update);
     urlDatabase[req.params.id] = req.body.update;
+    users[currentUser.id].longURL[currentLongURL] = req.body.update
+    console.log(users);
+    console.log("USERS IS ^^^^^ DATABASE IS BELOW");
+    console.log(urlDatabase);
     res.redirect('/urls');
   }
 
@@ -243,7 +271,6 @@ let checkRegisterEmails = (email, objUsers) => {
       return checkEmails
 }
 
-
 let checkLoginEmail = (email, objUsers) => {
   let checkEmails = "";
   Object.keys(objUsers).forEach(function (c, i) {
@@ -264,15 +291,24 @@ let checkPasswords = (password, objUsers) => {
       return checkPasswords;
 }
 
-// properOwner = checkOwner(req.params.id, loggedEmail)
+  // properOwner = checkOwner(req.params.id, currentUser.id, currentLongURL);
 
-let checkOwner = (shortURLID, key) => {
-console.log("key with users: " + users[key].shortURL);
-  console.log("this is keyDOTshorturl " + key.shortURL);
-  console.log("this is shortURLID " + shortURLID);
-      if (users[key].shortURL== shortURLID) {
+
+let checkOwner = (shortURLID, key, currentLongURL) => {
+  console.log("shortURLID: " + shortURLID + " key " + key + " currentLongURL " + currentLongURL);
+      if (users[key].shortURL[currentLongURL] == shortURLID) {
         return true
       } else {
         return false
       }
+}
+
+
+let findCurrentLongURL = (currentUser, shortID) => {
+  for (var i = 0; i < currentUser.longURL.length; i++) {
+    if (currentUser.shortURL[i] === shortID) {
+      return i
+    }
+  }
+  return 0
 }

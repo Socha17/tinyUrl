@@ -18,8 +18,7 @@
 
 
       <li><%= url %>  <%= userCurrent.longURL[i] %>
-        <form method="POST" style="display: inline;" action="/urls/<%= userCurrent.shortURL %>/delete">
-        <button type="delete" name="delete">Delete</button>
+        <form method="POST" style="display: inline;"action="/urls/<%= userCurrent.shortURL[i] %>/delete"><button type="delete" name="delete">delete</button>
       </form>
       <a href="/urls/<%= userCurrent.shortURL[i] %>">
         <button type="update" name="update">Update</button>
