@@ -6,8 +6,10 @@
 </head>
 
 
+<section class="loginButons">
 
 <% if (loginStatus == false) { %>
+  <section class="mainLogin">
   <form action="/register" style="float: right;">
     <button type="register" name="register">Register</button>
   </form>
@@ -16,8 +18,8 @@
     <button type="login" name="login">Login</button>
   </form>
 <% } else { %>
-  <form action="/logout" method="POST"  style="float: right;">
-    <button type="logout" name="logout">Logout</button>
-  </form>
+
+</section>
+</section>
 
   <% } %>

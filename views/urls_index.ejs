@@ -1,23 +1,35 @@
-<% include ./partials/_header %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+  <link href="/css/styles.css" rel="stylesheet" />
+</head>
+
 <body>
+<div class="container">
     <!-- Add your EJS code here -->
+<section class="mainLogin">
+
 
     <% if (loginStatus == false) { %>
-      <h2>Log in or register to create and see your short URLS</h2>
+      <h2 class="logo">Tiny URL</h2>
     <% }  %>
 
 
 <% if (loginStatus == true) { %>
 
 <% if (userCurrent.shortURL == []) { %>
-    <h2>You dont have any Short URLS</h2>
+    <h1>You dont have any Short URLS</h1>
   <% } %>
 
+
+    <h1>Hello <%= userCurrent.email %> </h1>
   <%   console.log("this is userCurrent " + userCurrent.shortURL) %>
     <% userCurrent.shortURL.forEach(function(url, i) { %>
 
 
-      <li><%= url %>  <%= userCurrent.longURL[i] %>
+      <li>short URL: /u/<%= url %> <br>
+        Full URL: <%= userCurrent.longURL[i] %>
         <form method="POST" style="display: inline;"action="/urls/<%= userCurrent.shortURL[i] %>/delete"><button type="delete" name="delete">delete</button>
       </form>
       <a href="/urls/<%= userCurrent.shortURL[i] %>">
@@ -28,11 +40,30 @@
 
 
       <form action="urls/new">
-        <button type="new" name="new">Make a URL Short</button>
+        <button type="new" name="new">Add A Short URL</button>
       </form>
       <% } %>
 
+      <% if (loginStatus == false) { %>
+        <section class="mainloginForm">
+        <form action="/register" style="">
+          <button type="register" class="mainLoginButtons" name="register">Register</button>
+        </form>
 
+        <form action="/login" style="">
+          <button type="login" class="mainLoginButtons" name="login">Login</button>
+        </form>
+        </section>
+      <% } else { %>
+        <section class="logoutButton">
+        <form action="/logout" method="POST"  style="float: right;">
+          <button type="logout" name="logout">Logout</button>
+        </form>
+        </section>
+        <% } %>
 
+</section>
+
+</div>
 </body>
 </html>

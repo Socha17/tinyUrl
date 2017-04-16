@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
   <head></head>
-  <body style="font-size:20px; padding:50px;">
+  <body>
     <% include partials/_header %>
-    <form action="/urls" method="POST" style="margin:150px;">
+    <section class="mainLogin">
+    <form action="/urls" method="POST" >
       <h2>Create a short URL</h2>
       <label for="longURL">Enter a URL:</label>
       <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
       <input type="submit" value="Submit">
     </form>
+    <br>
+    <a href="/urls">Home</a>
+    <form action="/logout" method="POST"  style="float: right;">
+      <button type="logout" name="logout">Logout</button>
+    </form>
+  </section>
   </body>
 </html>

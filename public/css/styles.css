@@ -1,5 +1,32 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto');
 
+html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  background: -moz-linear-gradient(134deg, #205D7D 0%, #205D7D 1%, #174259 100%); /* ff3.6+ */
+  background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, #174259), color-stop(99%, #205D7D), color-stop(100%, #205D7D)); /* safari4+,chrome */
+  background: -webkit-linear-gradient(134deg, #205D7D 0%, #205D7D 1%, #174259 100%); /* safari5.1+,chrome10+ */
+  background: -o-linear-gradient(134deg, #205D7D 0%, #205D7D 1%, #174259 100%); /* opera 11.10+ */
+  background: -ms-linear-gradient(134deg, #205D7D 0%, #205D7D 1%, #174259 100%); /* ie10+ */
+  background: linear-gradient(316deg, #205D7D 0%, #205D7D 1%, #174259 100%); /* w3c */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#174259', endColorstr='#205D7D',GradientType=0 ); /* ie6-9 */
+  background-repeat: no-repeat;
+}
+
+body {
+  height:100%;
+  margin:0;
+  padding:0;
+  overflow:hidden;
+  padding: 50px;
+  font-family: 'Roboto', sans-serif;
+}
+
 input {
   padding: 5px;
   border: 1px solid #999;
@@ -16,11 +43,18 @@ input:hover {
 
 button, submit { border:none; }
 
-body {
-  padding: 50px;
-  font-family: 'Roboto', sans-serif;
-  margin: auto;
+
+div.content {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width:100%;
+  height:100%;
+  padding:10px;
+  background:#c0c0c0;
+  overflow:hidden;
 }
+
 
 li {
   padding: 10px
@@ -43,4 +77,47 @@ button:hover {
   background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
   background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
   text-decoration: none;
+}
+
+
+
+.mainLogin {
+  color: #205D7D;
+  -webkit-box-shadow: 2px 0px 101px 11px rgba(0,0,0,0.27);
+  -moz-box-shadow: 2px 0px 101px 11px rgba(0,0,0,0.27);
+  box-shadow: 2px 0px 101px 11px rgba(0,0,0,0.27);
+  margin-top: 7%;
+  margin-left: auto;
+  margin-right: auto;
+  width: 800px;
+  height: 600px;
+  background-color: white;
+  border-radius: 10px;
+}
+
+
+.logo {
+  width: 100%;
+  text-align:center;
+  display: inline-block;
+  padding-top: 105px;
+  font-size: 40px;
+}
+
+
+
+.mainloginForm {
+  margin-top: 50px;
+  width: 37%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+.mainLoginButtons {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  height: 55px;
+  width: 300px;
+  font-size: 15px;
 }

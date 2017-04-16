@@ -1,14 +1,19 @@
 <% include ./partials/_header %>
 
 
-
+<section class="mainLogin">
   <%   console.log(shortURL) %>
+  <h2>Update Page</h2>
 <h2>Short URL:  <%= shortURL %>
    <br>Full URL:  <%= urls %> </h2>
 
-
+<a href="/urls">Home</a>
 <form action="/urls/<%= shortURL %>/update" method="POST" style="margin:150px;">
   <label for="update">Update URL:</label>
   <input id="update" type="text" name="update" placeholder="http://" style="width: 300px">
   <input type="submit" value="Submit">
 </form>
+<form action="/logout" method="POST"  style="float: right;">
+  <button type="logout" name="logout">Logout</button>
+</form>
+</section>
