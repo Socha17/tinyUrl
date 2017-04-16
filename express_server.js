@@ -75,7 +75,6 @@ app.post("/register", (req, res) => {
   const checkEmails = checkRegisterEmails(req.body.email, users)
   // check if somthing was entered
   if (req.body.email == "") {
-    console.log('error 401');
     res.statusCode = 401;
     res.end("error 401 text field was blank")
   }
